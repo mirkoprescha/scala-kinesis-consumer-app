@@ -13,19 +13,19 @@ object KinesisConsumerApp extends App{
   System.setProperty("org.slf4j.simplelogger.defaultlog", "trace")
   implicit val logger = Logger(LoggerFactory.getLogger("KinesisConsumerApp"))
   logger.info ("start reading App Config")
-  val consumerConfig = new KinesisConsumerConfig
+  val kinesisConsumerConfig = new KinesisConsumerConfig
 
 
   val workerId = InetAddress.getLocalHost().getCanonicalHostName() +":" + UUID.randomUUID()
-  logger.debug (s"Using workerId: ${workerId}")
-
 
   val kclConfig:KinesisClientLibConfiguration = new KinesisClientLibConfiguration(
-    consumerConfig.applicationName,
-    consumerConfig.streamName,
+    kinesisConsumerConfig.applicationName,
+    kinesisConsumerConfig.streamName,
     new ProfileCredentialsProvider(),
     workerId
-  )
+  ).withKinesisEndpoint(kinesisConsumerConfig.streamEndpoint)
+
+  logger.info (s"Created KinesisClientLibConfiguration for Application ${kinesisConsumerConfig.applicationName} consuming ${kinesisConsumerConfig.streamName}")
 
   val recordProcessorFactory = new KinesisRecordProcessorFactory()
   val worker = new Worker(
@@ -33,6 +33,8 @@ object KinesisConsumerApp extends App{
     kclConfig,
     new NullMetricsFactory()
   )
+  logger.info (s"Created Worker for KinesisClientLibConfiguration with workerId ${workerId}")
+
   worker.run()
 
 }
