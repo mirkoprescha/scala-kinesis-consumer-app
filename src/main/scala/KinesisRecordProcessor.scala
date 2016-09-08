@@ -1,8 +1,9 @@
-import java.util
+package de.is24.data.dwh.metricaggregator
 
+import java.util
+import scala.collection.JavaConversions._
 import com.amazonaws.services.kinesis.clientlibrary.interfaces.{IRecordProcessor, IRecordProcessorCheckpointer}
 import com.amazonaws.services.kinesis.clientlibrary.types.ShutdownReason
-import com.amazonaws.services.kinesis.model
 import com.amazonaws.services.kinesis.model.Record
 import com.typesafe.scalalogging.Logger
 
@@ -20,18 +21,20 @@ class KinesisRecordProcessor (implicit logger: Logger) extends IRecordProcessor{
   private val NUM_RETRIES = 10
   private val CHECKPOINT_INTERVAL_MILLIS = 1000L
 
+
   override def initialize(shardId: String): Unit = {
     logger.info ("Initializing record processor for shard: " + shardId)
     this.kinesisShardId = shardId
   }
 
 
-  override def processRecords(records: util.List[model.Record], checkpointer: IRecordProcessorCheckpointer): Unit = {
-    for (records) {
+  override def processRecords(records: util.List[Record], checkpointer: IRecordProcessorCheckpointer): Unit = {
+    logger.debug(s"Processing ${records} records from ${kinesisShardId}")
+
+    for (record <- records) {
       try {
-        logger.debug(s"Processing ${records} records from ${kinesisShardId}")
         logger.trace(s"Sequence number: ${record.getSequenceNumber}")
-        logger.trace(record.getData.array)
+        logger.trace(s"Record data: ${record.getData.array.toString}")
         logger.trace(s"Partition key: ${record.getPartitionKey}")
       } catch {
         case t: Throwable =>
@@ -39,6 +42,7 @@ class KinesisRecordProcessor (implicit logger: Logger) extends IRecordProcessor{
           println(t)
       }
     }
+  }
 
 
   override def shutdown(checkpointer: IRecordProcessorCheckpointer, reason: ShutdownReason): Unit = {
