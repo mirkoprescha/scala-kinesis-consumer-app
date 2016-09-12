@@ -25,6 +25,8 @@ object KinesisConsumerApp extends App{
     new ProfileCredentialsProvider(),
     workerId
   ).withKinesisEndpoint(kinesisConsumerConfig.streamEndpoint)
+    .withRegionName(kinesisConsumerConfig.dynamoDBRegionName)
+
   logger.info (s"Created KinesisClientLibConfiguration for Application ${kinesisConsumerConfig.applicationName} consuming ${kinesisConsumerConfig.streamName}")
 
   val recordProcessorFactory = new KinesisRecordProcessorFactory()

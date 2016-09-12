@@ -11,7 +11,7 @@ class KinesisConsumerConfig (implicit logger: Logger) {
   val streamEndpoint = conf.getString("kinesis.inputstream.endpoint")
   val streamName = conf.getString("kinesis.inputstream.name")
   val applicationName = conf.getString("kinesis.application.name")
-
+  val dynamoDBRegionName = conf.getString("kinesis.dynamoDB.regionName")
 
   logger.info ("KinesisInputStream: " + streamName)
   logger.info ("KinesisApplicationName: " + applicationName)
